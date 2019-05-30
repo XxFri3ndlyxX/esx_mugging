@@ -1,6 +1,6 @@
 # esx_mugging
 
-EDITED AND FIXED BY XxFri3ndlyxX
+EDITED AND FIXED BY XxFri3ndlyxX  
 This script will allow anyone other then police to mug locals on a server.
 This was based off https://github.com/D3uxx/esx_robnpc with a few improvements.
 
