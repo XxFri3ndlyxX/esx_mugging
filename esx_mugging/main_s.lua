@@ -1,6 +1,5 @@
 local ESX = nil
 
-
 Citizen.CreateThread(function()
 
 	while ESX == nil do
@@ -26,7 +25,6 @@ AddEventHandler('esx_muggings:giveItems', function(itemName)
         xPlayer.addInventoryItem(itemName, 1)
 
 end)
-
 
 RegisterServerEvent('esx_mugging:muggingAlert')
 AddEventHandler('esx_mugging:muggingAlert', function(street1, street2, sex)
