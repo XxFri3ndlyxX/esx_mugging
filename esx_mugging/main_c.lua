@@ -2,16 +2,6 @@ ESX                           = nil
 lastrobbed = 0
 local robbing = false
 local currentrobbing = false
-local giveableItems = {
-    'weed',
-	'water',
-	'hamburger',
-	'lighter',
-	'coke',
-	'vodka',
-	'meth',
-	'ecola'
-}
 
 Citizen.CreateThread(function()
     while ESX == nil do
