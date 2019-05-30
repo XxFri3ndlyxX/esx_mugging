@@ -1,13 +1,25 @@
-local ESX = nil
+ESX = nil
+local copsConnected = 0
 
-Citizen.CreateThread(function()
+TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 
-	while ESX == nil do
-		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
-		Citizen.Wait(0)
-	end
+function CountCops()
 
-end)
+    local xPlayers = ESX.GetPlayers()
+    copsConnected = 0
+
+    for i=1, #xPlayers, 1 do
+        local xPlayer = ESX.GetPlayerFromId(xPlayers[i])
+        if xPlayer.job.name == 'police' then
+            copsConnected = copsConnected + 1
+        end
+    end
+    TriggerClientEvent('esx_mugging:copsConnected', -1, copsConnected)
+
+    SetTimeout(60000, CountCops)
+
+end
+CountCops()
 
 RegisterServerEvent('esx_muggings:giveMoney')
 AddEventHandler('esx_muggings:giveMoney', function()
