@@ -1,7 +1,8 @@
-ESX                           = nil
-lastrobbed = 0
-local robbing = false
-local currentrobbing = false
+ESX                    = nil
+lastrobbed             = 0
+local robbing          = false
+local currentrobbing   = false
+local copsConnected    = 0
 
 Citizen.CreateThread(function()
     while ESX == nil do
@@ -32,7 +33,7 @@ Citizen.CreateThread(function()
         else  
         if IsPlayerFreeAiming(PlayerId()) then
             local aiming, targetPed = GetEntityPlayerIsFreeAimingAt(PlayerId())
-                if IsPedArmed(GetPlayerPed(-1), 7) and IsPedArmed(GetPlayerPed(-1), 4) and ESX.PlayerData.job.name ~= 'police' and not IsPedAPlayer(targetPed) and not IsEntityAMissionEntity(targetPed) then
+                if IsPedArmed(GetPlayerPed(-1), 7) and IsPedArmed(GetPlayerPed(-1), 4) and ESX.PlayerData.job.name ~= 'police' and not IsPedAPlayer(targetPed) and not IsEntityAMissionEntity(targetPed) and copsConnected >= Config.CopsNeeded then
                     if aiming then
                     local playerPed = GetPlayerPed(-1)
                     local pCoords = GetEntityCoords(playerPed, true)
@@ -60,7 +61,9 @@ Citizen.CreateThread(function()
         end  
     end
 end)
-
+--//////////////////////////////////////////////--
+--                 ROBBING NPC                  --
+--//////////////////////////////////////////////--
 function robNpc(targetPed)
     Citizen.CreateThread(function()
     local roblocalcoords = GetEntityCoords(targetPed)
@@ -129,7 +132,6 @@ function robNpc(targetPed)
                             })
                         end
                     end)
-                    --exports['progressBars']:startUI(Config.RobWaitTime * 1000, "Mugging...")
                     Citizen.Wait(Config.RobWaitTime * 1000)
                     if not IsPedFleeing(targetPed) then
                        if not IsPedDeadOrDying(targetPed) then
@@ -238,8 +240,17 @@ function robNpc(targetPed)
         end
     end)
 end
-
-GetPlayerName()
+--//////////////////////////////////////////////--
+--               CONNECTED COPS                 --
+--//////////////////////////////////////////////--
+RegisterNetEvent('esx_mugging:copsConnected')
+AddEventHandler('esx_mugging:copsConnected', function(copsNumber)
+    copsConnected = copsNumber
+    ESX.PlayerData = ESX.GetPlayerData()
+end)
+--//////////////////////////////////////////////--
+--                NOTIFICATION                  --
+--//////////////////////////////////////////////--
 RegisterNetEvent('muggingNotify')
 AddEventHandler('muggingNotify', function(alert, xPlayer)
         if  ESX.PlayerData.job.name == 'police' then
@@ -247,7 +258,9 @@ AddEventHandler('muggingNotify', function(alert, xPlayer)
         ESX.ShowAdvancedNotification('911 Emergency', 'Mugging', alert, 'CHAR_CALL911', 1)
         end
 end)
-
+--//////////////////////////////////////////////--
+--                   LOCATION                   --
+--//////////////////////////////////////////////--
 RegisterNetEvent('esx_mugging:muggingPos')
 AddEventHandler('esx_mugging:muggingPos', function(tx, ty, tz)
 	if ESX.PlayerData.job.name == 'police' then
