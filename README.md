@@ -1,6 +1,9 @@
 # esx_mugging
 
 EDITED AND FIXED BY XxFri3ndlyxX  
+VIDEO  
+[![](http://img.youtube.com/vi/FrnCpRCeqNs/0.jpg)](http://www.youtube.com/watch?v=FrnCpRCeqNs "")  
+
 This script will allow anyone other then police to mug locals on a server.
 This was based off https://github.com/D3uxx/esx_robnpc with a few improvements.
 
