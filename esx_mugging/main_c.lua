@@ -3,14 +3,14 @@ lastrobbed = 0
 local robbing = false
 local currentrobbing = false
 local giveableItems = {
-    'weed_pooch',
+    'weed',
 	'water',
-	'bread',
+	'hamburger',
 	'lighter',
-	'coke_pooch',
+	'coke',
 	'vodka',
-	'lsd_pooch',
-	'soda'
+	'meth',
+	'ecola'
 }
 
 Citizen.CreateThread(function()
@@ -24,6 +24,15 @@ Citizen.CreateThread(function()
 	ESX.PlayerData = ESX.GetPlayerData()
 end)
 
+RegisterNetEvent('esx:playerLoaded')
+AddEventHandler('esx:playerLoaded', function(xPlayer)
+	PlayerData = xPlayer
+end)
+
+RegisterNetEvent('esx:setJob')
+AddEventHandler('esx:setJob', function(job)
+  ESX.PlayerData.job = job
+end)
 
 Citizen.CreateThread(function()
     while true do
@@ -84,7 +93,15 @@ function robNpc(targetPed)
                     PlayAmbientSpeech1(targetPed, "GUN_BEG", "SPEECH_PARAMS_FORCE_NORMAL_CLEAR")
                     currentrobbing = true
                     TaskHandsUp(targetPed, 1000, 0, 0, true)
-                    ESX.ShowNotification("Already Mugged this person.")
+                    exports.pNotify:SendNotification({
+                        text = ('Already Mugged this person.'), 
+                        type = "success", 
+                        timeout = 1000, 
+                        layout = "centerRight", 
+                        queue = "right",
+                        killer = false,
+                        animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}
+                    })
                     
                     TaskSmartFleePed(targetPed, GetPlayerPed(-1), -1, -1, true, true)
                     Citizen.Wait(3000)
@@ -94,6 +111,34 @@ function robNpc(targetPed)
                     PlayAmbientSpeech1(targetPed, "GUN_BEG", "SPEECH_PARAMS_FORCE_NORMAL_CLEAR")
                     currentrobbing = true
                     TaskHandsUp(targetPed, Config.RobWaitTime * 1000, 0, 0, true)
+                    TriggerEvent("mythic_progbar:client:progress", {
+                        name = "Mugging",
+                        duration = Config.RobWaitTime * 1000,
+                        label = "Mugging In Progress",
+                        useWhileDead = false,
+                        canCancel = true,
+                        controlDisables = {
+                            disableMovement = false,
+                            disableCarMovement = false,
+                            disableMouse = false,
+                            disableCombat = false,
+                        },
+                        
+                    }, function(status)
+                        if not status then
+                            Lockpicked = true
+                            ClearPedTasks(player)
+                            exports.pNotify:SendNotification({
+                                text = ('Mugged NPC Successfuly'), 
+                                type = "success", 
+                                timeout = 1000, 
+                                layout = "centerRight", 
+                                queue = "right",
+                                killer = false,
+                                animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}
+                            })
+                        end
+                    end)
                     --exports['progressBars']:startUI(Config.RobWaitTime * 1000, "Mugging...")
                     Citizen.Wait(Config.RobWaitTime * 1000)
                     if not IsPedFleeing(targetPed) then
@@ -104,7 +149,7 @@ function robNpc(targetPed)
                                         randomitemcount = math.random(1,Config.AddItemsMax)
                                     for i = randomitemcount,1,-1
                                     do
-                                        local itemName = giveableItems[GetRandomIntInRange(1,  #giveableItems)]
+                                        local itemName = Config.giveableItems[GetRandomIntInRange(1,  #giveableItems)]
                                         TriggerServerEvent('esx_muggings:giveItems', (itemName))
                                     end
                                 end
@@ -143,7 +188,15 @@ function robNpc(targetPed)
                         else
                             if Config.AlwaysNotifyonDeath then
                                 
-                                ESX.ShowNotification("Target died - Police will be notified")
+                                exports.pNotify:SendNotification({
+                                    text = ('Target died - Police will be notified'), 
+                                    type = "success", 
+                                    timeout = 1000, 
+                                    layout = "centerRight", 
+                                    queue = "right",
+                                    killer = false,
+                                    animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}
+                                })
                                 ESX.TriggerServerCallback('esx_skin:getPlayerSkin', function(skin, jobSkin)
                                     local sex = nil
                                     if skin.sex == 0 then
@@ -160,7 +213,15 @@ function robNpc(targetPed)
                             currentrobbing = false
                         end
                     else
-                        ESX.ShowNotification("Target ran away")
+                        exports.pNotify:SendNotification({
+                            text = ('Target ran away'), 
+                            type = "success", 
+                            timeout = 1000, 
+                            layout = "centerRight", 
+                            queue = "right",
+                            killer = false,
+                            animation = {open = "gta_effects_fade_in", close = "gta_effects_fade_out"}
+                        })
                         
                         lastrobbed = math.random(1, 100)
                         if lastrobbed <= Config.PoliceNotify then
@@ -191,16 +252,11 @@ end
 GetPlayerName()
 RegisterNetEvent('muggingNotify')
 AddEventHandler('muggingNotify', function(alert, xPlayer)
-        if  ESX.PlayerData.job.name == 'police' then       
+        if  ESX.PlayerData.job.name == 'police' then
+        PlaySoundFrontend(-1, "Event_Start_Text", "GTAO_FM_Events_Soundset", 0)    
         ESX.ShowAdvancedNotification('911 Emergency', 'Mugging', alert, 'CHAR_CALL911', 1)
         end
 end)
-
-function Notify(text)
-    SetNotificationTextEntry('STRING')
-    AddTextComponentString(text)
-    DrawNotification(false, false)
-end
 
 RegisterNetEvent('esx_mugging:muggingPos')
 AddEventHandler('esx_mugging:muggingPos', function(tx, ty, tz)
