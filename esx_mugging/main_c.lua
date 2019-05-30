@@ -141,7 +141,8 @@ function robNpc(targetPed)
                                         randomitemcount = math.random(1,Config.AddItemsMax)
                                     for i = randomitemcount,1,-1
                                     do
-                                        local itemName = Config.giveableItems[GetRandomIntInRange(1,  #giveableItems)]
+                                        local randomitempull = math.random(1, #Config.giveableItems)
+                                        local itemName = Config.giveableItems[randomitempull]
                                         TriggerServerEvent('esx_muggings:giveItems', (itemName))
                                     end
                                 end
