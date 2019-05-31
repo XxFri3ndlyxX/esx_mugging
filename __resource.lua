@@ -13,9 +13,3 @@ server_script {
     "server/main.lua",
     "config.lua"
 }
-
-dependency {
-	'es_extended',
-	'pNotify',
-	'mythic_progressbar'
-}
