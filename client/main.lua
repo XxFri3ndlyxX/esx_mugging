@@ -264,7 +264,15 @@ RegisterNetEvent('muggingNotify')
 AddEventHandler('muggingNotify', function(alert, xPlayer, coords)
         if  ESX.PlayerData.job.name == 'police' then  
             if Config.GCPhone then 
-                TriggerServerEvent('esx_phone:send', "police", alert, true, coords)    
+                local playerPed = PlayerPedId()
+                Pedloc = GetEntityCoords(playerPed)
+
+                local PlayerCoords = { x = Pedloc.x, y = Pedloc.y, z = Pedloc.z }
+
+                TriggerServerEvent('esx_addons_gcphone:startCall', 'police', 'Reported assault!!!', PlayerCoords, {
+
+                    PlayerCoords = { x = Pedloc.x, y = Pedloc.y, z = Pedloc.z },
+                })
             else
                 ESX.ShowAdvancedNotification('911 Emergency', 'Mugging', alert, 'CHAR_CALL911', 1)
             end
